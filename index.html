@@ -94,7 +94,15 @@
                     this.map.remove();
                 }
                 try {
-                    const response = await axios.get("https://96.61.158.12:8080/software-test?zipCode=" + this.zipCode);
+                    //Here I ended up doing some work. My domain was expired and thankfully not taken so I repurchased it.
+                    // Then I needed to associate my domain with a valid cert which allows for secure traffic as the blasted github pages didn't like mixed content (https and http).
+                    // Next it took forever for the records to correctly reflect the TLS and cloudflare is not as intuitive as I remember it being for this type of triage.
+                    // All in all you have a domain serving the backend for this work.
+
+                    // I didn't like the idea of passing the key around in the frontend. Moreover the key that was provide was expired. I ended up using another API call altogether and hosting from the backend.
+                    // This work probably isn't as clean or sexy as I might make it but with the many hiccups to get this running, I decided that good enough was good enough for tonight.
+                    // Please feel free to take a look at the backend code where the work really happens. It's also a part of this repository.
+                    const response = await axios.get("https://blessedmusicalturkeys.com:8080/software-test?zipCode=" + this.zipCode);
                     this.setResults(response);
 
                 } catch (error) {
