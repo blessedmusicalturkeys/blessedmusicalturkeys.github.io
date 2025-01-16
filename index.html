@@ -36,7 +36,7 @@
         .button-container > button {
             padding: 10px 18px;
             color: #fff;
-            background-color: #3498db;
+            background-color: #008000;
             border: none;
             border-radius: 5px;
             font-size: 14px;
@@ -45,11 +45,11 @@
         }
 
         .button-container > button:hover {
-            background-color: #2980b9;
+            background-color: #00A000;
         }
 
         .button-container > button:active {
-            background-color: #3498db;
+            background-color: #006000;
         }
 
         .input-container, .test-results-container {
@@ -94,7 +94,7 @@
                     this.map.remove();
                 }
                 try {
-                    const response = await axios.get("http://96.61.158.12:8080/software-test?zipCode=" + this.zipCode);
+                    const response = await axios.get("https://96.61.158.12:8080/software-test?zipCode=" + this.zipCode);
                     this.setResults(response);
 
                 } catch (error) {
