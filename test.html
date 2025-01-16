@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>FreightWise Programming Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.21.1/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        #map {
+            height: 400px;
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        .text-zip-code {
+            padding: 10px;
+            font-size: 16px;
+            width: 250px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .button-container > button {
+            padding: 10px 18px;
+            color: #fff;
+            background-color: #3498db;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+
+            transition: background-color 0.3s ease;
+        }
+
+        .button-container > button:hover {
+            background-color: #2980b9;
+        }
+
+        .button-container > button:active {
+            background-color: #3498db;
+        }
+
+        .input-container, .test-results-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+    </style>
+
+</head>
+
+<body>
+<div id="app">
+    <div class="input-container">
+        <input class="text-zip-code" v-model="zipCode" type="text" placeholder="Enter a Zip, e.g. 37027">
+    </div>
+
+    <div class="test-results-container">
+        <div v-html="testResults"></div>
+    </div>
+
+    <div class="button-container">
+        <button @click="run" :disabled="!zipCode">Get the Weather at {{zipCode}}</button>
+    </div>
+
+    <div id="map"></div>
+</div>
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                zipCode: '37027',
+                map: null,
+                testResults: '',
+            };
+        },
+        methods: {
+            async run() {
+                if (!this.zipCode) return;
+                if (this.map !== null) {
+                    this.map.remove();
+                }
+                try {
+                    const response = await axios.get("http://96.61.158.12:8080/software-test?zipCode=" + this.zipCode);
+                    this.setResults(response);
+
+                } catch (error) {
+                    this.setError(error);
+                }
+            },
+            setError(message) {
+                this.testResults = (message.response.data || '').toString();
+            },
+            setResults(results) {
+                let lat = results.data.latitude;
+                let lng = results.data.longitude;
+                let temp = results.data.temperatureFahrenheit;
+                let humidity = results.data.humidity;
+
+                this.testResults = `Temperature: ${temp}, Humidity: ${humidity}%, Longitude: ${lng}, Latitude: ${lat}`;
+
+                this.populateMap(lat, lng, temp, humidity);
+            },
+            populateMap(lat, lng, temp, humidity) {
+                this.map = L.map('map').setView([lat, lng], 12);
+                L.marker([lat, lng]).addTo(this.map).bindPopup(`Temperature: ${temp}, Humidity: ${humidity}%`).openPopup();
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                }).addTo(this.map);
+            }
+        },
+    })
+</script>
+</body>
+</html>
